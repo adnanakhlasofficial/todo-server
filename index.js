@@ -39,6 +39,11 @@ async function run() {
       res.send(result);
     });
 
+    app.get("/users", async (req, res) => {
+      const result = await userCollection.find().toArray();
+      res.send(result);
+    });
+
     app.post("/tasks", async (req, res) => {
       const taskInfo = req.body;
       const result = await taskCollection.insertOne(taskInfo);
@@ -46,7 +51,10 @@ async function run() {
     });
 
     app.get("/tasks", async (req, res) => {
-      const result = await taskCollection.find().toArray();
+      const { email } = req.query;
+      const result = await taskCollection
+        .find({ "user.email": email })
+        .toArray();
       res.send(result);
     });
 
