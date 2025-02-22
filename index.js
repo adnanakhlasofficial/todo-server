@@ -3,6 +3,7 @@ import express from "express";
 import cors from "cors";
 import { MongoClient, ServerApiVersion } from "mongodb";
 import morgan from "morgan";
+import { ObjectId } from "mongodb";
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -38,9 +39,34 @@ async function run() {
       res.send(result);
     });
 
-    app.post("/add-task", async (req, res) => {
+    app.post("/tasks", async (req, res) => {
       const taskInfo = req.body;
       const result = await taskCollection.insertOne(taskInfo);
+      res.send(result);
+    });
+
+    app.get("/tasks", async (req, res) => {
+      const result = await taskCollection.find().toArray();
+      res.send(result);
+    });
+
+    app.patch("/tasks/:id", async (req, res) => {
+      const { id } = req.params;
+      const { category } = req.body;
+      const result = await taskCollection.updateOne(
+        { _id: new ObjectId(id) },
+        {
+          $set: {
+            category,
+          },
+        }
+      );
+      res.send(result);
+    });
+
+    app.delete("/tasks/:id", async (req, res) => {
+      const { id } = req.params;
+      const result = await taskCollection.deleteOne({ _id: new ObjectId(id) });
       res.send(result);
     });
 
